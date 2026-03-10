@@ -1,21 +1,33 @@
-FROM python:3.13-slim-bookworm
+FROM python:3.13-slim-bookworm AS builder
 
 WORKDIR /code
 
-# Instala dependências do sistema e  remove os caches
 RUN apt-get update \
     && apt-get install -y git ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install uv
+RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock /code/
+
 RUN uv sync --frozen
 
 COPY ./app /code/app
 
-ENV TZ=America/Sao_Paulo
+
+FROM python:3.13-slim-bookworm
+
+WORKDIR /code
+
+RUN apt-get update \
+    && apt-get install -y ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /code/.venv /code/.venv
+COPY --from=builder /code/app /code/app
+
 ENV PATH="/code/.venv/bin:$PATH"
+ENV TZ=America/Sao_Paulo
 
 EXPOSE 4411
 

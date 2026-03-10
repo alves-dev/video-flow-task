@@ -1,3 +1,5 @@
+docker rm -f video-flow
+
 cd ..
 docker build . -t video-flow:latest
 
