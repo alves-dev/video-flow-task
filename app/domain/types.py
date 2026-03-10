@@ -5,7 +5,7 @@ from enum import Enum
 from pydantic import BaseModel
 
 
-class CallbackStatus(Enum):
+class CallbackStatus(str, Enum):
     TRANSCRIBED = 'TRANSCRIBED'
     DOWNLOADED = 'DOWNLOADED'
 

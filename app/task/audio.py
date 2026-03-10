@@ -1,6 +1,7 @@
 import logging
 import os
 
+import requests
 from faster_whisper import WhisperModel
 
 from app.config.setting import setting
@@ -30,7 +31,40 @@ def transcribe(video: VideoDownload):
 
         logging.info(f"\n✅ Transcrição salva em: {transcribe_txt}")
 
-        callback(video, CallbackStatus.TRANSCRIBED, 'Transcrito com sucesso.')
+        response = _upload_transcription(transcribe_txt)
+
+        callback(video, CallbackStatus.TRANSCRIBED, 'Transcrito com sucesso.', data={'transcribe_file_url': response['data']['url']})
 
     except Exception as e:
         logging.error(e)
+
+
+def _upload_transcription(file_path, metadata_json=None):
+    headers = {
+        "X-API-Key": setting.SOS_API_KEY
+    }
+    data = {
+        "bucket": setting.SOS_BUCKET,
+        "isPublic": True
+    }
+
+    if metadata_json:
+        data["metadata"] = metadata_json
+
+    try:
+        files = {
+            "file": open(file_path, "rb")
+        }
+
+        response = requests.post(
+            f'{setting.SOS_URL}/api/files/upload',
+            headers=headers,
+            files=files,
+            data=data
+        )
+
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        logging.error(f"Erro ao enviar transcrição: {e}")
+        return None

@@ -20,7 +20,7 @@ def download(video: VideoDownload):
         subprocess.run(comando, check=True)
         logging.info("✅ Download concluído com sucesso!")
 
-        callback(video, CallbackStatus.DOWNLOADED, 'Baixado com sucesso')
+        callback(video, CallbackStatus.DOWNLOADED)
 
     except subprocess.CalledProcessError as e:
         logging.error(f"❌ Erro ao baixar: {e}")

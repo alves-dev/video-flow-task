@@ -5,11 +5,11 @@ import requests
 from app.domain.types import VideoDownload, CallbackStatus
 
 
-def callback(video: VideoDownload, status: CallbackStatus, message: str = None) -> None:
+def callback(video: VideoDownload, status: CallbackStatus, data: dict = None) -> None:
     body = {
         'id': video.id,
         'status': status,
-        'message': message
+        'data': data
     }
 
     try:

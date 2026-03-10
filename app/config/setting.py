@@ -13,6 +13,11 @@ class Settings(BaseSettings):
 
     WHISPER_MODEL: str = 'base'
 
+    # SOS
+    SOS_URL: str = 'https://sos.alves-dev.com'
+    SOS_API_KEY: str
+    SOS_BUCKET: str = 'video-flow-transcriptions'
+
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
