@@ -1,21 +1,22 @@
-FROM python:3.9-slim-bookworm
+FROM python:3.13-slim-bookworm
 
 WORKDIR /code
 
-# Instala o git e remove os caches pra manter a imagem leve
+# Instala dependências do sistema e  remove os caches
 RUN apt-get update \
-    && apt-get install -y git \
+    && apt-get install -y git ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-COPY uv.lock pyproject.toml /code/
+RUN pip install uv
+
+COPY pyproject.toml uv.lock /code/
+RUN uv sync --frozen
+
 COPY ./app /code/app
 
-RUN pip install uv \
-    && uv sync --frozen
-
-# Set the timezone
 ENV TZ=America/Sao_Paulo
+ENV PATH="/code/.venv/bin:$PATH"
+
 EXPOSE 4411
 
-ENV PATH="/code/.venv/bin:$PATH"
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:4411"]

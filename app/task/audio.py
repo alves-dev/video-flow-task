@@ -33,7 +33,7 @@ def transcribe(video: VideoDownload):
 
         response = _upload_transcription(transcribe_txt)
 
-        callback(video, CallbackStatus.TRANSCRIBED, 'Transcrito com sucesso.', data={'transcribe_file_url': response['data']['url']})
+        callback(video, CallbackStatus.TRANSCRIBED, {'transcribe_file_url': response['data']['url']})
 
     except Exception as e:
         logging.error(e)
