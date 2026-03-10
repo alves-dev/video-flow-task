@@ -1,3 +1,4 @@
+import logging
 from urllib.request import Request
 
 import uvicorn
@@ -8,8 +9,13 @@ from starlette.responses import JSONResponse, Response
 from app.api.core.error_handler import ResponseException
 from app.api.routes import router
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+)
+
 app = FastAPI(
-    title="Finance core"
+    title="Video FLow"
 )
 
 app.add_middleware(

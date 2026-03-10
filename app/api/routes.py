@@ -1,39 +1,34 @@
-import subprocess
 import logging
-from fastapi import APIRouter, BackgroundTasks
+
+from fastapi import APIRouter
 from fastapi.params import Depends
 
 from app.api.core.security import check_api_key
-from app.api.requests import VideoDownload
+from app.domain.types import Task, VideoDownload
+from app.task import video as video_task
+from app.task import audio as audio_task
+from app.task.task_queue import task_queue
 
 router = APIRouter(prefix='/api/v1')
 
 
-def baixar_video(url: str):
-    folder_output = "output"
-
-    comando = [
-        "yt-dlp",
-        "--extract-audio",
-        "--audio-format", "mp3",
-        "--audio-quality", "0",
-        "--output", f"{folder_output}/%(title)s.%(ext)s",
-        url
-    ]
-
-    try:
-        subprocess.run(comando, check=True)
-        logging.info("✅ Download concluído com sucesso!")
-    except subprocess.CalledProcessError as e:
-        logging.error(f"❌ Erro ao baixar: {e}")
-    except FileNotFoundError:
-        logging.error("❌ yt-dlp não encontrado. Instale com: pip install yt-dlp")
-
-
 @router.post("/download", dependencies=[Depends(check_api_key)])
-def video_download(video: VideoDownload, background_tasks: BackgroundTasks) -> bool:
+def video_download(video: VideoDownload) -> bool:
     try:
-        background_tasks.add_task(baixar_video, video.url)
+        task_video_download = Task(
+            name="video_download",
+            func=video_task.download,
+            args=(video,)
+        )
+
+        task_transcribe = Task(
+            name="transcribe",
+            func=audio_task.transcribe,
+            args=(video,)
+        )
+
+        task_queue.add_task(task_video_download)
+        task_queue.add_task(task_transcribe)
         return True
     except Exception as e:
         logging.error(e)
