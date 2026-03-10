@@ -1,0 +1,22 @@
+schema: v1
+
+repository:
+  title: Video FLow Task
+  description: Script pythpn para baixar o áudio de um vídeo, transcrever o áudio usando o whisper
+  license: NO-LICENSE
+  type: code
+  topics:
+    - python
+  website: https://admin.alves-dev.com
+
+project:
+  status: development
+  stack:
+    language: python
+    framework: fastapi
+    database:
+    protocols:
+      - http
+    tools:
+      - docker
+      - whisper
