@@ -16,13 +16,13 @@ router = APIRouter(prefix='/api/v1')
 def video_download(video: VideoDownload) -> bool:
     try:
         task_video_download = Task(
-            name="video_download",
+            name=f"download-{video.id}",
             func=video_task.download,
             args=(video,)
         )
 
         task_transcribe = Task(
-            name="transcribe",
+            name=f"transcribe-{video.id}",
             func=audio_task.transcribe,
             args=(video,)
         )
